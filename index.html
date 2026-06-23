@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Executive Project Dashboard</title>
+<style>
+  :root{
+    --blue:#0296D4; --yellow:#EAB308; --red:#DC2626; --green:#91BD00;
+    --slate:#4E5F70; --slateDark:#3B4A58; --grey:#E5E7EB;
+    --text:#111827; --text2:#4E5F70; --faint:#9CA3AF;
+    --grid:#EEF2F7; --track:#EEF2F7; --border:#E5E7EB; --white:#fff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#F3F5F7;color:var(--text);
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,system-ui,sans-serif;
+    font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:14px 22px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
+  .topbar h1{font-size:15px;font-weight:700;margin:0}
+  .topbar .sub{font-size:12px;color:var(--text2)}
+  .btns{display:flex;gap:8px;align-items:center}
+  button.act{font-size:13px;font-weight:600;border-radius:9px;padding:9px 14px;cursor:pointer;border:1px solid var(--border);background:var(--white);color:var(--text)}
+  button.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+  button.act:hover{filter:brightness(0.97)}
+  .viewpill{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff;background:var(--slate);padding:6px 12px;border-radius:999px}
+  .wrap{display:flex;align-items:flex-start;gap:24px;padding:16px}
+  .rail{width:300px;flex-shrink:0;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:18px;
+    position:sticky;top:74px;max-height:calc(100vh - 90px);overflow:auto}
+  .rail h2{font-size:15px;font-weight:700;margin:0}
+  .rail .hint{font-size:12px;color:var(--text2);margin:4px 0 0}
+  .grp{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin:16px 0 8px}
+  label.fl{display:block;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);margin-bottom:3px}
+  .field{margin-bottom:9px}
+  input.in,select.in{width:100%;font-size:12.5px;border:1px solid var(--border);border-radius:8px;padding:7px;color:var(--text);background:#fff;font-variant-numeric:tabular-nums;outline:none}
+  input.mi,select.mi{font-size:12px;padding:6px}
+  input.in:focus,select.in:focus,input.mi:focus,select.mi:focus{box-shadow:0 0 0 3px rgba(2,150,212,.2)}
+  .ml{display:block;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;color:var(--faint);margin-bottom:2px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px}
+  .card-row{margin-bottom:9px;padding-bottom:9px;border-bottom:1px solid var(--grid)}
+  .miniadd{display:flex;gap:6px}
+  button.mini{font-size:12px;font-weight:600;color:var(--blue);background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;margin-top:6px}
+  .stage{flex:1;min-width:0}
+  .shot-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin:0 0 8px}
+  .panelzone{max-width:1500px;background:#FBFCFD;border:1px solid var(--border);border-radius:16px;padding:28px}
+  body.view .rail{display:none}
+  body.view .panelzone{max-width:none}
+  body.view .shot-label{display:none}
+  .stripe{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-bottom:20px}
+  .stripe>span{flex:1}
+  .head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+  .ptitle{font-size:32px;font-weight:700;line-height:1.1;margin:0}
+  .pstatement{font-size:15px;color:var(--text2);margin-top:8px}
+  .badge{color:#fff;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:8px 16px;border-radius:999px;white-space:nowrap}
+  .meta{display:flex;gap:36px;flex-wrap:wrap;padding:12px 0 16px;border-bottom:1px solid var(--border);margin-bottom:16px}
+  .meta .ml2{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--faint)}
+  .meta .mv{font-size:14px;font-weight:600;color:var(--text);margin-top:2px}
+  .evm{display:flex;gap:40px;flex-wrap:wrap;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 20px;margin-bottom:20px}
+  .evm .el{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--faint)}
+  .evm .ev{font-size:16px;font-weight:700;margin-top:2px}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+  .panel{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 1px 2px rgba(17,24,39,.04);display:flex;flex-direction:column}
+  .ptit{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text2)}
+  .psub{font-size:11.5px;color:var(--faint);margin-top:3px}
+  .kpi{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px 18px;box-shadow:0 1px 2px rgba(17,24,39,.04)}
+  .kpi .kl{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);margin-bottom:7px}
+  .kpi .kv{font-size:34px;font-weight:700;line-height:1}
+  .kpi .ks{font-size:10.5px;color:var(--faint);margin-top:7px}
+  svg .ax{font-size:11px;fill:var(--faint)}
+  svg .vlab{font-size:11px;fill:var(--text2);font-weight:600}
+  svg .cat{font-size:10.5px;fill:var(--text2)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin-top:8px}
+  .legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
+  .toast{position:fixed;right:18px;bottom:18px;background:#111827;color:#fff;border-radius:12px;padding:14px 16px;max-width:440px;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .toast a{color:#7FD0F2;word-break:break-all;font-size:12px}
+  .toast .tt{font-size:13px;font-weight:600;margin-bottom:6px}
+  .toast button{margin-top:10px;font-size:12px;font-weight:600;border:none;border-radius:8px;padding:7px 12px;cursor:pointer;background:var(--blue);color:#fff}
+  /* tooltip */
+  #tip{position:fixed;z-index:100;max-width:300px;background:#111827;color:#fff;border-radius:10px;padding:9px 11px;font-size:12px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.28);pointer-events:none;display:none}
+  #tip .tt-title{font-weight:700;margin-bottom:3px}
+  #tip .tt-body{color:#D1D5DB}
+  [data-tt]{cursor:default}
+  @media print{.topbar,.rail,.shot-label{display:none}.wrap{padding:0}.panelzone{max-width:none;border:none}#tip{display:none!important}}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div><h1 id="topTitle">Executive Project Dashboard</h1><div class="sub" id="topSub"></div></div>
+    <div class="btns" id="topBtns"></div>
+  </div>
+  <div class="wrap">
+    <div class="rail" id="rail"></div>
+    <div class="stage">
+      <div class="shot-label">Screenshot or share this panel. Hover or tap any chart for detail.</div>
+      <div class="panelzone" id="capture"></div>
+    </div>
+  </div>
+  <div id="toast"></div>
+  <div id="tip"></div>
+
+<script>
+/* ============ tokens & helpers ============ */
+var C={blue:"#0296D4",yellow:"#EAB308",red:"#DC2626",green:"#91BD00",slate:"#4E5F70",slateDark:"#3B4A58",grey:"#E5E7EB",text:"#111827",text2:"#4E5F70",faint:"#9CA3AF",grid:"#EEF2F7",track:"#EEF2F7"};
+var CUR={USD:"$",CAD:"$",EUR:"\u20AC",GBP:"\u00A3"};
+var STATUS={"Complete":C.green,"In Progress":C.blue,"At Risk":C.yellow,"Blocked":C.red,"Not Started":C.faint};
+var STATUS_OPTS=Object.keys(STATUS);
+var DAY=86400000;
+function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function fmtCur(v,c){return (CUR[c]||"$")+Math.round(v).toLocaleString("en-US");}
+function fmtHrs(v){return Math.round(v).toLocaleString("en-US")+"h";}
+function fmtPct(v){return v.toFixed(1)+"%";}
+function fmtRatio(v){return isFinite(v)?v.toFixed(2):"\u2014";}
+function fmtDate(ms){var d=new Date(ms);return isNaN(d)?"":d.toLocaleDateString("en-US",{month:"short",day:"numeric"});}
+function band(v){if(!isFinite(v)||v<=0)return{label:"No Data",color:C.faint,key:"nd"};if(v>=0.9)return{label:"Healthy",color:C.blue,key:"blue"};if(v>=0.8)return{label:"At Risk",color:C.yellow,key:"yellow"};return{label:"Critical",color:C.red,key:"red"};}
+function spiPhrase(v){return !isFinite(v)?"no data yet":v>=1?"on or ahead of schedule":v>=0.9?"marginally behind schedule":v>=0.8?"behind schedule and needs attention":"significantly behind schedule";}
+function cpiPhrase(v){return !isFinite(v)?"no data yet":v>=1?"on or under budget":v>=0.9?"slightly over budget":v>=0.8?"over budget and needs cost control":"significantly over budget";}
+function bandThr(b){return b.key==="blue"?"at or above the 0.90 Healthy threshold":b.key==="yellow"?"in the 0.80 to 0.89 At Risk band":b.key==="red"?"below the 0.80 Critical threshold":"not yet computable";}
+function niceMax(m){if(m<=0)return 1;var p=Math.pow(10,Math.floor(Math.log10(m)));var n=m/p;var s=n<=1?1:n<=2?2:n<=5?5:10;return s*p;}
+function tip(title,body){return ' data-tt="'+esc(title)+'" data-tb="'+esc(body)+'"';}
+
+/* ============ default seed ============ */
+var DEFAULT={
+  p:{projectName:"Print & Mail Implementation",pm:"A. Sheikh",client:"Regional Utility Co.",phase:"Build & Configuration",
+     period:"Wk 12 (Jun 9 - Jun 20, 2026)",reportDate:"2026-06-20",startDate:"2026-03-23",endDate:"2026-09-18",
+     totalHours:"2400",actualHours:"1120",pctComplete:"42",expectedProgress:"48",rate:"165",currency:"USD",openRisks:"4",openIssues:"2"},
+  work:[{name:"Requirements & Sign-off",pct:"100",exp:"100",start:"2026-03-23",due:"2026-04-17",status:"Complete"},
+        {name:"Data Integration",pct:"50",exp:"60",start:"2026-04-06",due:"2026-06-26",status:"In Progress"},
+        {name:"Platform Configuration",pct:"40",exp:"50",start:"2026-04-20",due:"2026-07-24",status:"In Progress"},
+        {name:"Template & Composition",pct:"25",exp:"38",start:"2026-05-11",due:"2026-07-10",status:"At Risk"},
+        {name:"Testing & UAT",pct:"10",exp:"18",start:"2026-06-15",due:"2026-08-21",status:"In Progress"},
+        {name:"Go-Live & Handover",pct:"0",exp:"0",start:"2026-08-24",due:"2026-09-18",status:"Not Started"}]
+};
+
+var state, viewMode=false;
+
+/* ============ share encode/decode ============ */
+function encodeState(s){return btoa(unescape(encodeURIComponent(JSON.stringify(s))));}
+function decodeState(str){return JSON.parse(decodeURIComponent(escape(atob(str))));}
+function readHash(){
+  var h=location.hash.replace(/^#/,"");if(!h)return null;
+  var isView=/(^|&)view(&|$)/.test(h);
+  var m=h.match(/(?:^|&)d=([^&]+)/);var data=null;
+  if(m){try{data=decodeState(decodeURIComponent(m[1]));}catch(e){data=null;}}
+  return {isView:isView,data:data};
+}
+
+/* ============ compute ============ */
+function compute(){
+  var p=state.p, rate=num(p.rate), totalH=num(p.totalHours), actualH=num(p.actualHours), pctC=num(p.pctComplete);
+  var bac=totalH*rate, expPct;
+  var s=new Date(p.startDate).getTime(), e=new Date(p.endDate).getTime(), r=new Date(p.reportDate).getTime();
+  if(p.expectedProgress===""||isNaN(parseFloat(p.expectedProgress))){
+    expPct=(e-s>0)?Math.min(100,Math.max(0,((r-s)/(e-s))*100)):0;
+  } else expPct=num(p.expectedProgress);
+  var pv=expPct/100*bac, ev=pctC/100*bac, ac=actualH*rate;
+  var spi=pv>0?ev/pv:NaN, cpi=ac>0?ev/ac:NaN;
+  var sv=ev-pv, cv=ev-ac;
+  var eac=(cpi>0&&isFinite(cpi))?bac/cpi:NaN, etc=isFinite(eac)?eac-ac:NaN, vac=isFinite(eac)?bac-eac:NaN;
+  var tcpi=(bac-ac!==0)?(bac-ev)/(bac-ac):NaN;
+  var elapsedPct=(e>s)?Math.min(100,Math.max(0,((r-s)/(e-s))*100)):0;
+  var spentPct=bac>0?(ac/bac)*100:0;
+  var plannedDur=e-s;
+  var forecastEndMs=(spi>0&&isFinite(spi)&&plannedDur>0)?(s+plannedDur/spi):NaN;
+  var slipDays=isFinite(forecastEndMs)?Math.round((forecastEndMs-e)/DAY):NaN;
+  var eacOpt=ac+(bac-ev);
+  var eacPess=(cpi>0&&spi>0&&isFinite(cpi)&&isFinite(spi))?ac+(bac-ev)/(cpi*spi):NaN;
+  var elapsedMonths=(r>s)?((r-s)/(30.44*DAY)):0;
+  var burnPerMonth=elapsedMonths>0?ac/elapsedMonths:NaN;
+  var monthsLeft=(burnPerMonth>0)?((bac-ac)/burnPerMonth):NaN;
+  var exhaustMs=isFinite(monthsLeft)?(r+monthsLeft*30.44*DAY):NaN;
+  return {rate:rate,bac:bac,pv:pv,ev:ev,ac:ac,spi:spi,cpi:cpi,sv:sv,cv:cv,eac:eac,etc:etc,vac:vac,tcpi:tcpi,
+    expPct:expPct,pctC:pctC,elapsedPct:elapsedPct,spentPct:spentPct,plannedEndMs:e,forecastEndMs:forecastEndMs,slipDays:slipDays,
+    eacOpt:eacOpt,eacPess:eacPess,burnPerMonth:burnPerMonth,exhaustMs:exhaustMs};
+}
+
+/* ============ chart builders (with tooltips) ============ */
+function gaugePanel(title,value,b,why){
+  var mk=Math.min(Math.max((isFinite(value)?value:0)/1.5,0),1)*100;
+  var f=Math.min(Math.max((isFinite(value)?value:0)/1.5,0),1);
+  var r=50,cx=60,cy=60,sw=14,circ=2*Math.PI*r;
+  var ring='<svg viewBox="0 0 120 120" style="width:100%;height:150px">'
+    +'<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+C.track+'" stroke-width="'+sw+'"/>'
+    +'<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+b.color+'" stroke-width="'+sw+'" stroke-linecap="round" stroke-dasharray="'+(f*circ)+' '+circ+'" transform="rotate(-90 '+cx+' '+cy+')"/></svg>';
+  var center='<div'+tip(title+": "+b.label,why)+' style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">'
+    +'<div style="font-size:30px;font-weight:700;color:'+b.color+'">'+fmtRatio(value)+'</div>'
+    +'<div style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:'+C.faint+'">'+b.label+'</div></div>';
+  var strip='<div style="margin-top:8px"><div style="position:relative;height:10px">'
+    +'<div style="display:flex;height:10px;border-radius:5px;overflow:hidden"><div'+tip("Critical zone","SPI or CPI below 0.80.")+' style="width:53.3%;background:'+C.red+'"></div><div'+tip("At Risk zone","SPI or CPI from 0.80 to 0.89.")+' style="width:6.7%;background:'+C.yellow+'"></div><div'+tip("Healthy zone","SPI or CPI at or above 0.90.")+' style="width:40%;background:'+C.blue+'"></div></div>'
+    +'<div style="position:absolute;top:-4px;left:calc('+mk+'% - 5px);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid '+C.text+'"></div></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:9.5px;color:'+C.faint+';margin-top:3px"><span>0.80</span><span>0.90</span><span>1.50</span></div></div>';
+  return panel(title,null,3,'<div style="position:relative;height:150px">'+ring+center+'</div>'+strip);
+}
+function cartesian(W,H,padL,padB,maxY,fmtY){
+  var padT=16,padR=12,plotW=W-padL-padR,plotH=H-padT-padB,ticks=5,g="";
+  for(var i=0;i<=ticks;i++){var val=maxY*i/ticks,y=padT+plotH-(val/maxY)*plotH;
+    g+='<line x1="'+padL+'" y1="'+y+'" x2="'+(W-padR)+'" y2="'+y+'" stroke="'+C.grid+'"/>';
+    g+='<text class="ax" x="'+(padL-6)+'" y="'+(y+3)+'" text-anchor="end">'+fmtY(val)+'</text>';}
+  return {g:g,padT:padT,padL:padL,padR:padR,plotW:plotW,plotH:plotH,W:W,H:H,yOf:function(v){return padT+plotH-(v/maxY)*plotH;}};
+}
+function vbars(items,cur,fmtV){
+  var W=items.length<=3?300:480,H=240;
+  var maxY=niceMax(Math.max.apply(null,items.map(function(x){return x.value;})));
+  var ax=cartesian(W,H,68,30,maxY,function(v){return fmtV(v,cur);});
+  var n=items.length,gap=ax.plotW/n,bw=gap*0.5;
+  var bars="";for(var i=0;i<n;i++){var x=ax.padL+gap*i+gap*0.25,y=ax.yOf(items[i].value),h=ax.yOf(0)-y;
+    bars+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+Math.max(0,h)+'" rx="5" fill="'+items[i].fill+'"'+tip(items[i].full||items[i].name,(items[i].note?items[i].note+"\n":"")+fmtV(items[i].value,cur))+'/>';
+    bars+='<text class="vlab" x="'+(x+bw/2)+'" y="'+(y-6)+'" text-anchor="middle">'+fmtV(items[i].value,cur)+'</text>';
+    bars+='<text class="ax" x="'+(x+bw/2)+'" y="'+(H-10)+'" text-anchor="middle">'+esc(items[i].name)+'</text>';}
+  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+ax.g+bars+'</svg>';
+}
+function groupedSVG(rows,cur){
+  var W=480,H=250,maxY=niceMax(Math.max.apply(null,rows.map(function(r){return Math.max(r.est,r.act);})));
+  var ax=cartesian(W,H,52,30,maxY,function(v){return v+"h";});
+  var n=rows.length,gw=ax.plotW/n,bw=gw*0.28;
+  var bars="";for(var i=0;i<n;i++){var cx=ax.padL+gw*i+gw*0.5,x1=cx-bw-2,x2=cx+2,y1=ax.yOf(rows[i].est),y2=ax.yOf(rows[i].act);
+    bars+='<rect x="'+x1+'" y="'+y1+'" width="'+bw+'" height="'+(ax.yOf(0)-y1)+'" rx="4" fill="'+C.slate+'"'+tip(rows[i].name,"Estimated (Work): "+fmtHrs(rows[i].est))+'/>';
+    bars+='<rect x="'+x2+'" y="'+y2+'" width="'+bw+'" height="'+(ax.yOf(0)-y2)+'" rx="4" fill="'+C.blue+'"'+tip(rows[i].name,"Actual Effort: "+fmtHrs(rows[i].act))+'/>';
+    bars+='<text class="cat" x="'+cx+'" y="'+(H-10)+'" text-anchor="middle">'+esc(rows[i].name)+'</text>';}
+  var leg='<div class="legend"><span><span class="sw" style="background:'+C.slate+'"></span>Estimated (Work)</span><span><span class="sw" style="background:'+C.blue+'"></span>Actual Effort</span></div>';
+  return leg+'<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+ax.g+bars+'</svg>';
+}
+function divergingSVG(rows){
+  var W=480,H=250,padT=10,padB=10,nameW=140,plotX=nameW,plotW=W-nameW-40,zero=plotX+plotW/2;
+  var maxAbs=Math.max(1,Math.max.apply(null,rows.map(function(r){return Math.abs(r.varH);})));
+  var rh=(H-padT-padB)/rows.length,bh=Math.min(18,rh*0.5);
+  var out='<line x1="'+zero+'" y1="'+padT+'" x2="'+zero+'" y2="'+(H-padB)+'" stroke="'+C.slate+'"/>';
+  for(var i=0;i<rows.length;i++){var cy=padT+rh*i+rh/2,w=(rows[i].varH/maxAbs)*(plotW/2),x=w>=0?zero:zero+w;
+    var col=rows[i].varH>0?C.red:rows[i].varH<0?C.green:C.faint;
+    var earned=rows[i].actH-rows[i].varH;
+    var body="Actual "+fmtHrs(rows[i].actH)+" vs earned "+fmtHrs(earned)+"\nVariance "+(rows[i].varH>=0?"+":"")+rows[i].varH+"h ("+(rows[i].varH>0?"over budget":rows[i].varH<0?"under budget":"on budget")+")";
+    out+='<rect x="'+x+'" y="'+(cy-bh/2)+'" width="'+Math.abs(w)+'" height="'+bh+'" rx="3" fill="'+col+'"'+tip(rows[i].name,body)+'/>';
+    out+='<text class="cat" x="4" y="'+(cy+3)+'">'+esc(rows[i].name)+'</text>';
+    var lx=w>=0?(zero+Math.abs(w)+4):(zero-Math.abs(w)-4);
+    out+='<text class="vlab" x="'+lx+'" y="'+(cy+3)+'" text-anchor="'+(w>=0?"start":"end")+'">'+(rows[i].varH>=0?"+":"")+rows[i].varH+'h</text>';}
+  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+out+'</svg>';
+}
+function donutSVG(rows){
+  var total=rows.reduce(function(a,b){return a+b.value;},0)||1,cx=110,cy=110,ro=100,ri=58,ang=0,paths="";
+  function polar(r,deg){var a=(deg-90)*Math.PI/180;return [cx+r*Math.cos(a),cy+r*Math.sin(a)];}
+  for(var i=0;i<rows.length;i++){var frac=rows[i].value/total,end=ang+frac*360;
+    var p1=polar(ro,end),p2=polar(ro,ang),p3=polar(ri,ang),p4=polar(ri,end),lg=(end-ang)>180?1:0;
+    paths+='<path d="M'+p1[0]+' '+p1[1]+' A'+ro+' '+ro+' 0 '+lg+' 0 '+p2[0]+' '+p2[1]+' L'+p3[0]+' '+p3[1]+' A'+ri+' '+ri+' 0 '+lg+' 1 '+p4[0]+' '+p4[1]+' Z" fill="'+rows[i].fill+'"'+tip(rows[i].name,"Actual: "+fmtHrs(rows[i].value)+"\nShare: "+(frac*100).toFixed(1)+"% of total effort")+'/>';
+    ang=end;}
+  var leg='<div class="legend">'+rows.map(function(r){return '<span><span class="sw" style="background:'+r.fill+'"></span>'+esc(r.name)+' '+fmtHrs(r.value)+'</span>';}).join("")+'</div>';
+  return '<svg viewBox="0 0 220 220" style="width:100%;height:auto;max-height:230px">'+paths+'</svg>'+leg;
+}
+function progressSVG(rows){
+  var W=480,H=250,padT=10,padB=10,nameW=140,plotX=nameW,plotW=W-nameW-40,rh=(H-padT-padB)/rows.length;
+  var out="",xOf=function(v){return plotX+(v/100)*plotW;};
+  for(var t=0;t<=100;t+=25){out+='<line x1="'+xOf(t)+'" y1="'+padT+'" x2="'+xOf(t)+'" y2="'+(H-padB)+'" stroke="'+C.grid+'"/>';out+='<text class="ax" x="'+xOf(t)+'" y="'+(H-2)+'" text-anchor="middle">'+t+'%</text>';}
+  for(var i=0;i<rows.length;i++){var cy=padT+rh*i+rh/2,gap=(rows[i].pct-rows[i].exp);
+    var body="% complete: "+rows[i].pct+"%\nExpected: "+rows[i].exp+"%\nGap: "+(gap>=0?"+":"")+gap.toFixed(0)+" pts ("+(gap>=0?"ahead":"behind")+")";
+    out+='<rect x="'+plotX+'" y="'+(cy-rh/2+2)+'" width="'+plotW+'" height="'+(rh-4)+'" fill="transparent" pointer-events="all"'+tip(rows[i].name,body)+'/>';
+    out+='<rect x="'+plotX+'" y="'+(cy-9)+'" width="'+((rows[i].pct/100)*plotW)+'" height="8" rx="4" fill="'+C.blue+'"/>';
+    out+='<rect x="'+plotX+'" y="'+(cy+1)+'" width="'+((rows[i].exp/100)*plotW)+'" height="8" rx="4" fill="'+C.slate+'"/>';
+    out+='<text class="cat" x="4" y="'+(cy+3)+'">'+esc(rows[i].name)+'</text>';}
+  var leg='<div class="legend"><span><span class="sw" style="background:'+C.blue+'"></span>% Complete</span><span><span class="sw" style="background:'+C.slate+'"></span>Expected</span></div>';
+  return leg+'<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+out+'</svg>';
+}
+function ganttSVG(){
+  var ms=state.work.filter(function(m){return (m.name||"").trim()!=="";}).map(function(m){return{name:m.name,s:new Date(m.start).getTime(),e:new Date(m.due).getTime(),status:m.status,rs:m.start,rd:m.due};}).filter(function(m){return !isNaN(m.s)&&!isNaN(m.e);});
+  if(!ms.length)return "";
+  var minS=Math.min.apply(null,ms.map(function(m){return m.s;})),maxD=Math.max.apply(null,ms.map(function(m){return m.e;}));
+  var W=900,padT=10,nameW=160,plotX=nameW,plotW=W-nameW-30,rh=34,H=padT+ms.length*rh+24;
+  var xOf=function(ms2){return plotX+((ms2-minS)/((maxD-minS)||1))*plotW;};
+  var out="";
+  for(var t=0;t<=5;t++){var tm=minS+(maxD-minS)*t/5,x=xOf(tm);out+='<line x1="'+x+'" y1="'+padT+'" x2="'+x+'" y2="'+(padT+ms.length*rh)+'" stroke="'+C.grid+'"/>';out+='<text class="ax" x="'+x+'" y="'+(H-6)+'" text-anchor="middle">'+fmtDate(tm)+'</text>';}
+  for(var i=0;i<ms.length;i++){var cy=padT+rh*i+rh/2,x1=xOf(ms[i].s),x2=xOf(ms[i].e);
+    var days=Math.round((ms[i].e-ms[i].s)/DAY);
+    var body=fmtDate(ms[i].s)+" to "+fmtDate(ms[i].e)+"\nStatus: "+ms[i].status+"\nDuration: "+days+" days";
+    out+='<rect x="'+x1+'" y="'+(cy-9)+'" width="'+Math.max(2,x2-x1)+'" height="18" rx="4" fill="'+(STATUS[ms[i].status]||C.faint)+'"'+tip(ms[i].name,body)+'/>';
+    out+='<text class="cat" x="4" y="'+(cy+3)+'">'+esc(ms[i].name)+'</text>';}
+  var leg='<div class="legend">'+STATUS_OPTS.map(function(s){return '<span><span class="sw" style="background:'+STATUS[s]+'"></span>'+s+'</span>';}).join("")+'</div>';
+  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+out+'</svg>'+leg;
+}
+
+function triadSVG(elapsed,spent,work){
+  var W=480,H=170,padT=10,nameW=120,plotX=nameW,plotW=W-nameW-50;
+  var rows=[["Time elapsed",elapsed,C.slate],["Budget spent",spent,C.blue],["Work earned",work,C.green]];
+  var rh=(H-padT-20)/rows.length,out="";
+  for(var t=0;t<=100;t+=25){var x=plotX+(t/100)*plotW;out+='<line x1="'+x+'" y1="'+padT+'" x2="'+x+'" y2="'+(padT+rows.length*rh)+'" stroke="'+C.grid+'"/>';out+='<text class="ax" x="'+x+'" y="'+(H-4)+'" text-anchor="middle">'+t+'%</text>';}
+  for(var i=0;i<rows.length;i++){var cy=padT+rh*i+rh/2,v=Math.min(100,Math.max(0,rows[i][1]));
+    out+='<rect x="'+plotX+'" y="'+(cy-7)+'" width="'+((v/100)*plotW)+'" height="14" rx="4" fill="'+rows[i][2]+'"'+tip(rows[i][0],rows[i][0]+": "+rows[i][1].toFixed(1)+"%")+'/>';
+    out+='<text class="cat" x="4" y="'+(cy+3)+'">'+rows[i][0]+'</text>';
+    out+='<text class="vlab" x="'+(plotX+(v/100)*plotW+6)+'" y="'+(cy+3)+'">'+rows[i][1].toFixed(0)+'%</text>';}
+  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+out+'</svg>';
+}
+function statusDonut(counts,total){
+  var cx=110,cy=110,ro=100,ri=58,ang=0,paths="";
+  function polar(r,deg){var a=(deg-90)*Math.PI/180;return [cx+r*Math.cos(a),cy+r*Math.sin(a)];}
+  for(var i=0;i<counts.length;i++){var frac=counts[i].value/(total||1),end=ang+frac*360;
+    var p1=polar(ro,end),p2=polar(ro,ang),p3=polar(ri,ang),p4=polar(ri,end),lg=(end-ang)>180?1:0;
+    paths+='<path d="M'+p1[0]+' '+p1[1]+' A'+ro+' '+ro+' 0 '+lg+' 0 '+p2[0]+' '+p2[1]+' L'+p3[0]+' '+p3[1]+' A'+ri+' '+ri+' 0 '+lg+' 1 '+p4[0]+' '+p4[1]+' Z" fill="'+counts[i].fill+'"'+tip(counts[i].name+" ("+counts[i].value+")",counts[i].value+" of "+total+" milestones, "+(frac*100).toFixed(0)+"%"+(counts[i].body?"\n"+counts[i].body:""))+'/>';
+    ang=end;}
+  return '<svg viewBox="0 0 220 220" style="width:100%;height:auto;max-height:200px">'+paths+'</svg>';
+}
+
+function trackerSVG(rows){
+  // rows: {name, pct, exp, startMs, dueMs, status}
+  var W=980,padT=30,nameW=170,progW=140,progX=W-progW-46,tlX=nameW,tlW=progX-tlX-30;
+  var dated=rows.filter(function(r){return !isNaN(r.startMs)&&!isNaN(r.dueMs);});
+  var minS=dated.length?Math.min.apply(null,dated.map(function(r){return r.startMs;})):0;
+  var maxD=dated.length?Math.max.apply(null,dated.map(function(r){return r.dueMs;})):1;
+  var span=(maxD-minS)||1, rh=34, H=padT+rows.length*rh+24;
+  var xDate=function(ms){return tlX+((ms-minS)/span)*tlW;};
+  var xProg=function(v){return progX+(Math.min(100,Math.max(0,v))/100)*progW;};
+  var out="";
+  // headers
+  out+='<text class="ax" x="'+tlX+'" y="16" style="font-weight:600">Timeline</text>';
+  out+='<text class="ax" x="'+progX+'" y="16" style="font-weight:600">Progress vs expected</text>';
+  // timeline date gridlines
+  for(var t=0;t<=4;t++){var tm=minS+span*t/4,x=xDate(tm);out+='<line x1="'+x+'" y1="'+padT+'" x2="'+x+'" y2="'+(padT+rows.length*rh)+'" stroke="'+C.grid+'"/>';out+='<text class="ax" x="'+x+'" y="'+(H-6)+'" text-anchor="middle">'+fmtDate(tm)+'</text>';}
+  // progress scale 0 and 100
+  out+='<text class="ax" x="'+progX+'" y="'+(H-6)+'" text-anchor="middle">0</text>';
+  out+='<text class="ax" x="'+(progX+progW)+'" y="'+(H-6)+'" text-anchor="middle">100%</text>';
+  for(var i=0;i<rows.length;i++){var r=rows[i],cy=padT+rh*i+rh/2;
+    out+='<text class="cat" x="4" y="'+(cy+3)+'">'+esc(r.name)+'</text>';
+    if(!isNaN(r.startMs)&&!isNaN(r.dueMs)){var x1=xDate(r.startMs),x2=xDate(r.dueMs),days=Math.round((r.dueMs-r.startMs)/DAY);
+      out+='<rect x="'+x1+'" y="'+(cy-8)+'" width="'+Math.max(2,x2-x1)+'" height="16" rx="4" fill="'+(STATUS[r.status]||C.faint)+'"'+tip(r.name,fmtDate(r.startMs)+" to "+fmtDate(r.dueMs)+"\nStatus: "+r.status+"\nDuration: "+days+" days")+'/>';}
+    // progress mini-bar
+    out+='<rect x="'+progX+'" y="'+(cy-6)+'" width="'+progW+'" height="12" rx="6" fill="'+C.grid+'"/>';
+    out+='<rect x="'+progX+'" y="'+(cy-6)+'" width="'+((Math.min(100,Math.max(0,r.pct))/100)*progW)+'" height="12" rx="6" fill="'+C.blue+'"'+tip(r.name,"% complete: "+r.pct+"%\nExpected: "+r.exp+"%\nGap: "+((r.pct-r.exp)>=0?"+":"")+(r.pct-r.exp).toFixed(0)+" pts ("+((r.pct-r.exp)>=0?"ahead":"behind")+")")+'/>';
+    out+='<line x1="'+xProg(r.exp)+'" y1="'+(cy-9)+'" x2="'+xProg(r.exp)+'" y2="'+(cy+9)+'" stroke="'+C.slateDark+'" stroke-width="2"/>';
+    out+='<text class="vlab" x="'+(progX+progW+6)+'" y="'+(cy+3)+'">'+r.pct+'%</text>';}
+  var leg='<div class="legend" style="margin-top:8px">'+STATUS_OPTS.map(function(s){return '<span><span class="sw" style="background:'+STATUS[s]+'"></span>'+s+'</span>';}).join("")
+    +'<span><span class="sw" style="background:'+C.blue+'"></span>% complete</span><span><span class="sw" style="width:3px;height:12px;background:'+C.slateDark+'"></span>expected</span></div>';
+  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+out+'</svg>'+leg;
+}
+
+function progressRing(pct,planned){
+  var box=200,cx=100,cy=100,R=80,sw=18,c=2*Math.PI*R,p=Math.min(100,Math.max(0,pct)),dash=(p/100)*c;
+  var out='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+C.grid+'" stroke-width="'+sw+'"/>';
+  out+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+C.blue+'" stroke-width="'+sw+'" stroke-linecap="round" stroke-dasharray="'+dash+' '+(c-dash)+'" transform="rotate(-90 '+cx+' '+cy+')"'+tip("Actual % complete","Project-level percent complete on an earned-value basis. The tick marks planned progress for the report date.")+'/>';
+  var ang=(-90+(Math.min(100,Math.max(0,planned))/100)*360)*Math.PI/180,r1=R-sw/2-3,r2=R+sw/2+3;
+  out+='<line x1="'+(cx+r1*Math.cos(ang))+'" y1="'+(cy+r1*Math.sin(ang))+'" x2="'+(cx+r2*Math.cos(ang))+'" y2="'+(cy+r2*Math.sin(ang))+'" stroke="'+C.slateDark+'" stroke-width="3"'+tip("Planned progress","Where the schedule says the project should be by the report date: "+Math.round(planned)+"%.")+'/>';
+  return '<svg viewBox="0 0 '+box+' '+box+'" style="width:100%;height:auto;max-height:210px">'+out+'</svg>';
+}
+
+function ringMini(frac,color,big,small,markerFrac,markerColor,tt,tb){
+  var cx=60,cy=60,R=46,sw=12,c=2*Math.PI*R,f=Math.min(1,Math.max(0,(isFinite(frac)?frac:0))),dash=f*c;
+  var out='<circle cx="60" cy="60" r="46" fill="none" stroke="'+C.grid+'" stroke-width="12"/>';
+  out+='<circle cx="60" cy="60" r="46" fill="none" stroke="'+color+'" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+dash+' '+(c-dash)+'" transform="rotate(-90 60 60)"'+(tt?tip(tt,tb):"")+'/>';
+  if(markerFrac!=null&&isFinite(markerFrac)){var a=(-90+Math.min(1,Math.max(0,markerFrac))*360)*Math.PI/180,r1=R-sw/2-2,r2=R+sw/2+2;
+    out+='<line x1="'+(cx+r1*Math.cos(a))+'" y1="'+(cy+r1*Math.sin(a))+'" x2="'+(cx+r2*Math.cos(a))+'" y2="'+(cy+r2*Math.sin(a))+'" stroke="'+(markerColor||C.slateDark)+'" stroke-width="2.5"/>';}
+  out+='<text x="60" y="'+(small?56:66)+'" text-anchor="middle" style="font-size:22px;font-weight:700;fill:'+C.text+'">'+big+'</text>';
+  if(small)out+='<text x="60" y="75" text-anchor="middle" style="font-size:9px;font-weight:600;fill:'+C.faint+'">'+esc(small).toUpperCase()+'</text>';
+  return '<svg viewBox="0 0 120 120" style="width:100%;height:auto;max-height:150px">'+out+'</svg>';
+}
+
+/* ============ panel + kpi ============ */
+function panel(title,subtitle,span,body){
+  return '<div class="panel" style="grid-column:span '+span+'">'
+    +(title?'<div style="margin-bottom:14px"><div class="ptit">'+esc(title)+'</div>'+(subtitle?'<div class="psub">'+esc(subtitle)+'</div>':'')+'</div>':'')
+    +'<div style="flex:1">'+body+'</div></div>';
+}
+function kpi(label,value,sub,color,tt,tb){
+  return '<div class="kpi" style="grid-column:span 2"'+(tt?tip(tt,tb):"")+'><div class="kl">'+esc(label)+'</div>'
+    +'<div class="kv" style="color:'+(color||C.text)+'">'+value+'</div>'
+    +(sub?'<div class="ks">'+esc(sub)+'</div>':'')+'</div>';
+}
+
+/* ============ dashboard render ============ */
+function renderDashboard(){
+  var d=compute(),cur=state.p.currency,spiB=band(d.spi),cpiB=band(d.cpi);
+  var ord={red:3,yellow:2,blue:1,nd:0},overall=ord[spiB.key]>=ord[cpiB.key]?spiB:cpiB;
+  var driver=ord[spiB.key]>ord[cpiB.key]?"SPI":ord[cpiB.key]>ord[spiB.key]?"CPI":"both SPI and CPI";
+  var overallWhy="Overall status uses the worse of SPI and CPI.\nSPI "+fmtRatio(d.spi)+" ("+spiB.label+"), CPI "+fmtRatio(d.cpi)+" ("+cpiB.label+").\nDriven by "+driver+", "+bandThr(overall)+".";
+  var spiWhy="SPI = EV / PV = "+fmtCur(d.ev,cur)+" / "+fmtCur(d.pv,cur)+" = "+fmtRatio(d.spi)+".\nThis sits "+bandThr(spiB)+", so the schedule is "+spiPhrase(d.spi)+".\nThresholds: Healthy 0.90+, At Risk 0.80 to 0.89, Critical below 0.80.";
+  var cpiWhy="CPI = EV / AC = "+fmtCur(d.ev,cur)+" / "+fmtCur(d.ac,cur)+" = "+fmtRatio(d.cpi)+".\nThis sits "+bandThr(cpiB)+", so cost is "+cpiPhrase(d.cpi)+".\nThresholds: Healthy 0.90+, At Risk 0.80 to 0.89, Critical below 0.80.";
+
+  var wRows=state.work.filter(function(w){return (w.name||"").trim()!=="";}).map(function(w,i){
+    return{name:w.name,pct:num(w.pct),exp:num(w.exp),fill:[C.blue,C.slate,C.green,C.yellow,C.slateDark,C.red][i%6]};});
+  var progRows=wRows.filter(function(w){return w.pct>0||w.exp>0;});
+  var hasProg=progRows.length>0;
+
+  var stripe='<div class="stripe"><span style="background:'+C.green+'"></span><span style="background:'+C.blue+'"></span><span style="background:'+C.slate+'"></span><span style="background:'+C.grey+'"></span><span style="background:'+C.yellow+'"></span></div>';
+  var head='<div class="head"><div><div class="ptitle">'+esc(state.p.projectName||"Project Dashboard")+'</div>'
+    +'<div class="pstatement">SPI '+fmtRatio(d.spi)+' and CPI '+fmtRatio(d.cpi)+'. Overall status is <b'+tip("Why "+overall.label,overallWhy)+' style="color:'+overall.color+'">'+overall.label.toLowerCase()+'</b>, driven by the worse of schedule and cost.</div></div>'
+    +'<div class="badge" style="background:'+overall.color+'"'+tip("Why "+overall.label,overallWhy)+'>'+overall.label+'</div></div>';
+  var meta='<div class="meta">'+[["PM",state.p.pm],["Client",state.p.client],["Phase",state.p.phase],["Period",state.p.period],["Report Date",state.p.reportDate]].map(function(m){return '<div><div class="ml2">'+esc(m[0])+'</div><div class="mv">'+esc(m[1]||"\u2014")+'</div></div>';}).join("")+'</div>';
+  function el(l,v,c,tt,tb){return '<div'+(tt?tip(tt,tb):"")+'><div class="el">'+esc(l)+'</div><div class="ev" style="color:'+(c||C.text)+'">'+v+'</div></div>';}
+  var evm='<div class="evm">'
+    +el("Planned Value (PV)",fmtCur(d.pv,cur),C.slate,"Planned Value (PV)","Budgeted value of work scheduled by the report date. Expected % x BAC.")
+    +el("Earned Value (EV)",fmtCur(d.ev,cur),C.blue,"Earned Value (EV)","Budgeted value of work actually completed. % complete x BAC.")
+    +el("Actual Cost (AC)",fmtCur(d.ac,cur),C.slateDark,"Actual Cost (AC)","Effort actually spent in money. Actual hours x rate.")
+    +el("Schedule Variance (SV)",(d.sv>=0?"+":"\u2212")+fmtCur(Math.abs(d.sv),cur),d.sv>=0?C.green:C.red,"Schedule Variance (SV)","SV = EV - PV. Negative means behind schedule by this much value.")
+    +el("Cost Variance (CV)",(d.cv>=0?"+":"\u2212")+fmtCur(Math.abs(d.cv),cur),d.cv>=0?C.green:C.red,"Cost Variance (CV)","CV = EV - AC. Negative means over budget for the work done.")
+    +el("Budget (BAC)",fmtCur(d.bac,cur),null,"Budget at Completion (BAC)","Total approved budget. Total estimated hours x rate.")
+    +el("Forecast (EAC)",isFinite(d.eac)?fmtCur(d.eac,cur):"\u2014",C.yellow,"Estimate at Completion (EAC)","Forecast total cost at current efficiency. BAC / CPI.")
+    +el("Variance at Completion (VAC)",isFinite(d.vac)?((d.vac>=0?"+":"\u2212")+fmtCur(Math.abs(d.vac),cur)):"\u2014",isFinite(d.vac)?(d.vac>=0?C.green:C.red):C.text,"Variance at Completion (VAC)","VAC = BAC - EAC. Negative means the project is forecast to finish over budget.")
+    +'</div>';
+
+  // milestone status summary from rows with valid dates/status
+  var mRows=state.work.filter(function(w){return (w.name||"").trim()!=="";});
+  var rep=new Date(state.p.reportDate).getTime();
+  var byStatus={},overdue=0,doneM=0;
+  mRows.forEach(function(m){(byStatus[m.status]=byStatus[m.status]||[]).push(m.name);if(m.status==="Complete")doneM++;
+    var due=new Date(m.due).getTime();if(!isNaN(due)&&due<rep&&m.status!=="Complete")overdue++;});
+  var statusArr=STATUS_OPTS.filter(function(s){return byStatus[s];}).map(function(s){return{name:s,value:byStatus[s].length,fill:STATUS[s],body:byStatus[s].join("\n")};});
+  var hasMRows=mRows.length>0;
+  var donePct=mRows.length?(doneM/mRows.length*100):0;
+
+  var tcpiNote=isFinite(d.tcpi)?("Work must run at "+fmtRatio(d.tcpi)+" efficiency to finish on budget. "+(isFinite(d.cpi)&&d.tcpi>d.cpi+0.05?"That is above the current CPI of "+fmtRatio(d.cpi)+", so recovery is a stretch.":"That is in reach of the current CPI of "+fmtRatio(d.cpi)+".")):"Not computable yet.";
+  var slipTxt=isFinite(d.slipDays)?(d.slipDays<=0?Math.abs(d.slipDays)+" days early":d.slipDays+" days late"):"\u2014";
+  var slipColor=isFinite(d.slipDays)?(d.slipDays<=0?C.green:d.slipDays<=14?C.yellow:C.red):C.text;
+
+  var g="";
+  var gapPts=d.pctC-d.expPct;
+  function rcell(svg,label){return '<div style="text-align:center;max-width:175px"><div>'+svg+'</div><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:'+C.faint+';margin-top:6px">'+label+'</div></div>';}
+  var openR=state.p.openRisks||"0", openI=state.p.openIssues||"0";
+  g+=panel("Project Completion","Completion, performance, and open items at a glance",12,
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:18px;justify-items:center">'
+    +rcell(ringMini(d.pctC/100,C.blue,Math.round(d.pctC)+"%","complete",d.expPct/100,C.slateDark,"Actual % complete","Earned value basis. Tick marks planned progress for the report date. Gap vs plan is "+(gapPts>=0?"+":"")+gapPts.toFixed(0)+" pts."),"Actual % Complete")
+    +rcell(ringMini(d.expPct/100,C.slate,Math.round(d.expPct)+"%","planned",null,null,"Planned % complete","Where the schedule says the project should be by the report date."),"Planned % Complete")
+    +rcell(ringMini(isFinite(d.spi)?Math.min(d.spi,1.5)/1.5:0,spiB.color,fmtRatio(d.spi),spiB.label,1/1.5,C.faint,"SPI is "+spiB.label,spiWhy),"SPI")
+    +rcell(ringMini(isFinite(d.cpi)?Math.min(d.cpi,1.5)/1.5:0,cpiB.color,fmtRatio(d.cpi),cpiB.label,1/1.5,C.faint,"CPI is "+cpiB.label,cpiWhy),"CPI")
+    +rcell(ringMini(1,num(openR)>0?C.yellow:C.green,String(openR),"open",null,null,"Open Risks","Count of open items in the risk register that could still affect the project."),"Open Risks")
+    +rcell(ringMini(1,num(openI)>0?C.red:C.green,String(openI),"open",null,null,"Open Issues","Count of active issues already affecting the project and needing resolution."),"Open Issues")
+    +'</div>');
+  g+=gaugePanel("Schedule Performance (SPI)",d.spi,spiB,spiWhy);
+  g+=gaugePanel("Cost Performance (CPI)",d.cpi,cpiB,cpiWhy);
+  g+=panel("What These Numbers Mean",null,6,
+    '<div style="font-size:13.5px;line-height:1.55">'
+    +'<p style="margin:0 0 10px"><b style="color:'+spiB.color+'">SPI '+fmtRatio(d.spi)+'.</b> For every 1.00 of work the schedule planned by now, '+fmtRatio(d.spi)+' has been earned. The project is '+spiPhrase(d.spi)+'.</p>'
+    +'<p style="margin:0 0 14px"><b style="color:'+cpiB.color+'">CPI '+fmtRatio(d.cpi)+'.</b> The project earns '+fmtRatio(d.cpi)+' of value for every 1.00 of effort spent. It is '+cpiPhrase(d.cpi)+'.</p></div>'
+    +'<div style="border-top:1px solid '+C.grid+';padding-top:12px"><div style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:'+C.faint+';margin-bottom:8px">Health thresholds (SPI &amp; CPI)</div>'
+    +'<div class="legend"><span'+tip("Critical","Either SPI or CPI below 0.80. Schedule or cost is significantly off plan and needs escalation.")+'><span class="sw" style="background:'+C.red+'"></span>Below 0.80 Critical</span><span'+tip("At Risk","Either SPI or CPI between 0.80 and 0.89. Slipping against plan and needs corrective action.")+'><span class="sw" style="background:'+C.yellow+'"></span>0.80 to 0.89 At Risk</span><span'+tip("Healthy","Both SPI and CPI at or above 0.90. On or close to plan for schedule and cost.")+'><span class="sw" style="background:'+C.blue+'"></span>0.90 and above Healthy</span></div></div>');
+
+  g+=panel("Time, Cost & Work","Schedule elapsed vs budget spent vs work earned. If spend or time outruns work, the project is under pressure",6,
+    triadSVG(d.elapsedPct,d.spentPct,d.pctC)
+    +'<div style="font-size:12px;color:'+C.text2+';margin-top:8px">'+(d.spentPct>d.pctC+2||d.elapsedPct>d.pctC+2?"Time or spend is ahead of work delivered, a sign of schedule or cost pressure.":"Work delivered is keeping pace with time and spend.")+'</div>');
+  var vacTxt=isFinite(d.vac)?((d.vac>=0?"\u25B2 ":"\u25BC ")+fmtCur(Math.abs(d.vac),cur)+(d.vac>=0?" under budget":" over budget")):"\u2014";
+  var cvTxt=(d.cv>=0?"\u25B2 ":"\u25BC ")+fmtCur(Math.abs(d.cv),cur)+(d.cv>=0?" favorable":" unfavorable");
+  var budgetCaption='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:10px;font-size:12.5px;color:'+C.text2+'">'
+    +'<span'+tip("Variance at Completion (VAC)","BAC minus EAC. Forecast over or under budget at completion.")+'>VAC: <b style="color:'+(d.vac>=0?C.green:C.red)+'">'+vacTxt+'</b></span>'
+    +'<span'+tip("Cost Variance (CV)","EV minus AC. Over or under budget for the work done so far.")+'>CV to date: <b style="color:'+(d.cv>=0?C.green:C.red)+'">'+cvTxt+'</b></span></div>';
+  g+=panel("Budget vs Forecast","Budget, spent, forecast, and the resulting variances",6,vbars([
+    {name:"BAC",full:"Budget at Completion",note:"Total approved budget",value:d.bac,fill:C.slate},
+    {name:"AC",full:"Actual Cost (spent)",note:"Spent to date",value:d.ac,fill:C.blue},
+    {name:"EAC",full:"Estimate at Completion",note:"Forecast at current CPI",value:isFinite(d.eac)?d.eac:0,fill:C.yellow}],cur,fmtCur)+budgetCaption);
+
+  function frow(l,v,c,tt,tb){return '<div'+(tt?tip(tt,tb):"")+' style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid '+C.grid+';padding:9px 0"><span style="font-size:13px;color:'+C.text2+'">'+esc(l)+'</span><span style="font-size:17px;font-weight:700;color:'+(c||C.text)+'">'+v+'</span></div>';}
+  g+=panel("Forecast & Recovery","Where the schedule lands and the effort to recover",6,
+    frow("Planned end",fmtDate(d.plannedEndMs)+", "+new Date(d.plannedEndMs).getFullYear(),C.text,"Planned end","The baseline planned finish date you entered.")
+    +frow("Forecast end (SPI based)",isFinite(d.forecastEndMs)?(fmtDate(d.forecastEndMs)+", "+new Date(d.forecastEndMs).getFullYear()):"\u2014",slipColor,"Forecast end","Projects the finish date if the current SPI holds: planned duration divided by SPI, added to the start date.")
+    +frow("Schedule slippage",slipTxt,slipColor,"Schedule slippage","Days between the SPI-based forecast end and the planned end.")
+    +frow("TCPI to finish on budget",fmtRatio(d.tcpi),isFinite(d.tcpi)&&d.tcpi>1.05?C.yellow:C.green,"TCPI",tcpiNote));
+
+  var exhaustTxt=isFinite(d.exhaustMs)?(fmtDate(d.exhaustMs)+", "+new Date(d.exhaustMs).getFullYear()):"\u2014";
+  var exhaustColor=isFinite(d.exhaustMs)?(d.exhaustMs>=d.plannedEndMs?C.green:C.red):C.text;
+  g+=panel("Cost Forecast & Runway","Forecast spend range and how long the budget lasts",6,
+    frow("EAC optimistic",fmtCur(d.eacOpt,cur),C.green,"EAC optimistic","Remaining work runs at the original planned rate. AC + (BAC - EV).")
+    +frow("EAC likely",isFinite(d.eac)?fmtCur(d.eac,cur):"\u2014",C.yellow,"EAC likely","Current cost efficiency holds. BAC / CPI.")
+    +frow("EAC pessimistic",isFinite(d.eacPess)?fmtCur(d.eacPess,cur):"\u2014",C.red,"EAC pessimistic","Both cost and schedule drag persist. AC + (BAC - EV) / (CPI x SPI).")
+    +frow("Burn rate",isFinite(d.burnPerMonth)?(fmtCur(d.burnPerMonth,cur)+" / mo"):"\u2014",C.text,"Burn rate","Average spend per month so far. AC divided by months elapsed.")
+    +frow("Budget covers until",exhaustTxt,exhaustColor,"Budget runway","At the current burn rate, the date the approved budget is used up. Green if that is on or after the planned end, red if before."));
+
+  // upcoming milestones
+  var todayMid=new Date();todayMid.setHours(0,0,0,0);var todayMs=todayMid.getTime();
+  var up=mRows.map(function(m){return{name:m.name,due:new Date(m.due).getTime(),status:m.status};}).filter(function(m){return !isNaN(m.due)&&m.status!=="Complete";}).sort(function(a,b){return a.due-b.due;});
+  var upHtml=up.length?up.slice(0,5).map(function(m){var dd=Math.round((m.due-todayMs)/DAY);var late=dd<0;var txt=late?(Math.abs(dd)+(Math.abs(dd)===1?" day overdue":" days overdue")):(dd===0?"due today":"in "+dd+(dd===1?" day":" days"));
+    return '<div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid '+C.grid+';padding:8px 0"><span style="font-size:13px;color:'+C.text+'"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:'+(STATUS[m.status]||C.faint)+';margin-right:7px"></span>'+esc(m.name)+'</span><span style="font-size:12.5px;font-weight:600;color:'+(late?C.red:C.text2)+'">'+fmtDate(m.due)+", "+txt+'</span></div>';}).join(""):'<div style="font-size:13px;color:'+C.text2+'">All milestones complete.</div>';
+  g+=panel("Upcoming Milestones","Open milestones by next due date",6,upHtml);
+
+  if(hasMRows){
+    g+=panel("Milestone Status","Status breakdown by count. Center shows overall % complete",6,
+      '<div style="position:relative;height:200px">'+statusDonut(statusArr,mRows.length)
+      +'<div'+tip("Overall % complete","Project-level percent complete on an earned-value basis, the same figure as the Actual % Complete KPI and your Overall % complete input. The ring shows milestone counts by status, which is a different measure.")+' style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:26px;font-weight:700">'+Math.round(d.pctC)+'%</div><div style="font-size:10.5px;text-transform:uppercase;color:'+C.faint+'">complete</div></div></div>'
+      +'<div class="legend" style="margin-top:10px">'+statusArr.map(function(s){return '<span'+tip(s.name+" ("+s.value+")",s.value+" of "+mRows.length+" milestones\n"+s.body)+'><span class="sw" style="background:'+s.fill+'"></span>'+esc(s.name)+' ('+s.value+')</span>';}).join("")+'</div>'
+      +'<div style="margin-top:8px;font-size:12.5px;font-weight:600;color:'+(overdue>0?C.red:C.green)+'">'+(overdue>0?(overdue+" milestone"+(overdue>1?"s":"")+" overdue"):"No milestones overdue")+'</div>');
+  }
+
+  if(hasMRows){
+    var trackerRows=mRows.map(function(m){return{name:m.name,pct:num(m.pct),exp:num(m.exp),startMs:new Date(m.start).getTime(),dueMs:new Date(m.due).getTime(),status:m.status};});
+    g+=panel("Milestones & Progress","Timeline by status with progress against expected, per item. Hover any bar for detail",12,trackerSVG(trackerRows));
+  }
+  document.getElementById("capture").innerHTML=stripe+head+meta+evm+'<div class="grid">'+g+'</div>';
+}
+
+/* ============ rail ============ */
+function field(label,k,type){return '<div class="field"><label class="fl">'+esc(label)+'</label><input class="in" type="'+(type||"text")+'" data-scope="p" data-k="'+k+'" value="'+esc(state.p[k])+'"></div>';}
+function mini(label,scope,idx,k,type){return '<div><span class="ml">'+esc(label)+'</span><input class="in mi" type="'+(type||"text")+'" data-scope="'+scope+'" data-idx="'+idx+'" data-k="'+k+'" value="'+esc(state[scope][idx][k])+'"></div>';}
+function renderRail(){
+  var p=state.p;
+  var h='<h2>Dashboard Inputs</h2><div class="hint">Project totals drive all metrics. Breakdown tables are optional.</div>';
+  h+='<div class="grp">Project</div>'+field("Project name","projectName")+field("Project manager","pm")+field("Client","client")+field("Current phase","phase")+field("Reporting period","period")+field("Report date","reportDate","date")+field("Project start","startDate","date")+field("Planned end","endDate","date");
+  h+='<div class="grp">Effort &amp; Rate</div>'+field("Total estimated hours","totalHours","number")+field("Actual effort hours","actualHours","number")+field("Overall % complete","pctComplete","number")+field("Expected progress % (blank = auto)","expectedProgress","number")+field("Cost per hour","rate","number");
+  h+='<div class="field"><label class="fl">Currency</label><select class="in" data-scope="p" data-k="currency">'+["USD","CAD","EUR","GBP"].map(function(c){return '<option value="'+c+'"'+(p.currency===c?" selected":"")+'>'+c+'</option>';}).join("")+'</select></div>';
+  h+='<div class="row2">'+field("Open risks","openRisks","number")+field("Open issues","openIssues","number")+'</div>';
+  h+='<div class="grp">Optional: Workstreams &amp; Milestones</div>';
+  state.work.forEach(function(w,i){h+='<div class="card-row">'+mini("Name","work",i,"name")
+    +'<div class="row2" style="margin-top:4px">'+mini("% Complete","work",i,"pct")+mini("Expected %","work",i,"exp")+'</div>'
+    +'<div class="row2" style="margin-top:4px">'+mini("Start","work",i,"start","date")+mini("Due","work",i,"due","date")+'</div>'
+    +'<div style="margin-top:4px"><span class="ml">Status</span><select class="in mi" data-scope="work" data-idx="'+i+'" data-k="status">'+STATUS_OPTS.map(function(s){return '<option value="'+s+'"'+(w.status===s?" selected":"")+'>'+s+'</option>';}).join("")+'</select></div></div>';});
+  h+='<div class="miniadd"><button class="mini" data-add="work">+ Row</button>'+(state.work.length?'<button class="mini" data-del="work">Remove</button>':'')+'</div>';
+  document.getElementById("rail").innerHTML=h;
+}
+
+/* ============ events ============ */
+document.getElementById("rail").addEventListener("input",function(e){
+  var t=e.target;if(!t.dataset||!t.dataset.k)return;
+  if(t.dataset.scope==="p"){state.p[t.dataset.k]=t.value;}else{state[t.dataset.scope][+t.dataset.idx][t.dataset.k]=t.value;}
+  renderDashboard();
+});
+document.getElementById("rail").addEventListener("click",function(e){
+  var t=e.target;
+  if(t.dataset&&t.dataset.add){var s=t.dataset.add;
+    if(s==="work")state.work.push({name:"",pct:"",exp:"",start:"",due:"",status:"Not Started"});
+    renderRail();renderDashboard();}
+  if(t.dataset&&t.dataset.del){state[t.dataset.del].pop();renderRail();renderDashboard();}
+});
+
+/* ============ tooltip engine ============ */
+var tipEl=document.getElementById("tip"),tipPinned=false;
+function showTip(el,x,y){
+  tipEl.innerHTML='<div class="tt-title">'+(el.getAttribute("data-tt")||"")+'</div>'+
+    (el.getAttribute("data-tb")?'<div class="tt-body">'+el.getAttribute("data-tb").replace(/\n/g,"<br>")+'</div>':"");
+  tipEl.style.display="block";moveTip(x,y);
+}
+function moveTip(x,y){var pad=14,tw=tipEl.offsetWidth,th=tipEl.offsetHeight,nx=x+pad,ny=y+pad;
+  if(nx+tw>window.innerWidth-8)nx=x-tw-pad;if(ny+th>window.innerHeight-8)ny=y-th-pad;
+  tipEl.style.left=Math.max(8,nx)+"px";tipEl.style.top=Math.max(8,ny)+"px";}
+function hideTip(){tipEl.style.display="none";}
+document.addEventListener("mousemove",function(e){
+  if(tipPinned)return;
+  var el=e.target.closest?e.target.closest("[data-tt]"):null;
+  if(el)showTip(el,e.clientX,e.clientY);else hideTip();
+});
+document.addEventListener("click",function(e){
+  var el=e.target.closest?e.target.closest("[data-tt]"):null;
+  if(el){tipPinned=true;var r=el.getBoundingClientRect();showTip(el,r.left+r.width/2,r.top+r.height/2);}
+  else{tipPinned=false;hideTip();}
+});
+
+/* ============ share + export + mode ============ */
+function setMode(v){viewMode=v;document.body.classList.toggle("view",v);renderTopBar();}
+function renderTopBar(){
+  document.getElementById("topTitle").textContent=state.p.projectName||"Executive Project Dashboard";
+  document.getElementById("topSub").textContent=viewMode?"View only":(state.p.period||"");
+  var b=document.getElementById("topBtns");
+  if(viewMode){
+    b.innerHTML='<span class="viewpill">View only</span><button class="act" id="pngBtn">Download 8K PNG</button><button class="act" id="editBtn">Edit</button>';
+    document.getElementById("editBtn").onclick=function(){location.hash="";location.reload();};
+  } else {
+    b.innerHTML='<button class="act" id="pngBtn">Download 8K PNG</button><button class="act primary" id="shareBtn">Share</button>';
+    document.getElementById("shareBtn").onclick=doShare;
+  }
+  document.getElementById("pngBtn").onclick=exportPNG;
+}
+/* URL shortener endpoint. Returns JSON with a shorturl field.
+   Swap for an internal/corporate shortener to keep data off third parties.
+   Set to "" to disable shortening and always copy the full link. */
+var SHORTENER="https://is.gd/create.php?format=json&url=";
+function copyText(s){
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(s).catch(function(){fallbackCopy(s);});}
+  else fallbackCopy(s);
+}
+function fallbackCopy(s){var ta=document.createElement("textarea");ta.value=s;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);}
+function shorten(url){
+  if(!SHORTENER)return Promise.resolve(null);
+  return fetch(SHORTENER+encodeURIComponent(url)).then(function(r){return r.json();}).then(function(j){return (j&&j.shorturl)?j.shorturl:null;}).catch(function(){return null;});
+}
+function doShare(){
+  var longLink=location.origin+location.pathname+"#view&d="+encodeURIComponent(encodeState(state));
+  setMode(true);
+  document.getElementById("toast").innerHTML='<div class="toast"><div class="tt">Creating share link...</div></div>';
+  shorten(longLink).then(function(short){
+    var primary=short||longLink;
+    copyText(primary);
+    showToast(primary,longLink,!!short);
+  });
+}
+function showToast(primary,longLink,wasShort){
+  var t=document.getElementById("toast");
+  var note=wasShort?"Short link via is.gd. The encoded data passes through that service, so avoid it for confidential figures.":"Shortener unreachable, so the full link was copied instead.";
+  var fullBtn=(primary!==longLink)?'<button id="copyFull" style="background:#374151">Copy full link</button>':"";
+  t.innerHTML='<div class="toast"><div class="tt">Link copied. Executive view-only link.</div><a href="'+esc(primary)+'">'+esc(primary)+'</a>'
+    +'<div style="font-size:11px;color:#9CA3AF;margin-top:8px">'+esc(note)+'</div>'
+    +'<div style="display:flex;gap:8px;margin-top:10px"><button id="copyPrimary" style="margin-top:0">Copy link</button>'+fullBtn+'<button id="toastClose" style="margin-top:0;background:#374151">Close</button></div></div>';
+  document.getElementById("copyPrimary").onclick=function(){copyText(primary);};
+  if(primary!==longLink)document.getElementById("copyFull").onclick=function(){copyText(longLink);};
+  document.getElementById("toastClose").onclick=function(){t.innerHTML="";};
+}
+function exportPNG(){
+  var node=document.getElementById("capture"),w=node.offsetWidth,h=node.offsetHeight;
+  var css="";for(var i=0;i<document.styleSheets.length;i++){try{var rs=document.styleSheets[i].cssRules;for(var j=0;j<rs.length;j++)css+=rs[j].cssText;}catch(e){}}
+  var clone=node.cloneNode(true);clone.style.background="#FBFCFD";
+  var xhtml=new XMLSerializer().serializeToString(clone);
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'"><foreignObject x="0" y="0" width="'+w+'" height="'+h+'"><div xmlns="http://www.w3.org/1999/xhtml"><style>'+css+'</style>'+xhtml+'</div></foreignObject></svg>';
+  var img=new Image(),svgUrl="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
+  img.onload=function(){
+    var target=7680,scale=target/w,canvas=document.createElement("canvas");
+    canvas.width=Math.round(w*scale);canvas.height=Math.round(h*scale);
+    var ctx=canvas.getContext("2d");ctx.fillStyle="#FBFCFD";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.setTransform(scale,0,0,scale,0,0);
+    try{ctx.drawImage(img,0,0);canvas.toBlob(function(blob){if(!blob){fb();return;}var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=(state.p.projectName||"dashboard").replace(/\s+/g,"_")+"_8K.png";a.click();},"image/png");}catch(e){fb();}
+  };
+  img.onerror=fb;img.src=svgUrl;
+  function fb(){alert("Your browser blocked the in-page image export. The charts are vector, so two reliable options: 1) zoom the browser to 300-400% and screenshot, or 2) use Print and Save as PDF for crisp vector output.");}
+}
+
+/* ============ init ============ */
+(function init(){
+  var hash=readHash();
+  state=(hash&&hash.data)?hash.data:JSON.parse(JSON.stringify(DEFAULT));
+  state.work=state.work||[];
+  renderRail();renderDashboard();setMode(hash?!!hash.isView:false);
+})();
+</script>
+</body>
+</html>
